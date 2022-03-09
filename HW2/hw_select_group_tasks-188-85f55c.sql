@@ -121,8 +121,8 @@ From
 	Join Application.People 
 	On PurOrd.ContactPersonID = People.PersonID
 	Where 
-		PurOrd.IsOrderFinalized = 0x01 AND PurOrd.ExpectedDeliveryDate between N'1013-01-01' AND N'2013-01-31'  
-
+		PurOrd.IsOrderFinalized = 0x01 AND PurOrd.ExpectedDeliveryDate between N'2013-01-01' AND N'2013-01-31'  
+	
 
 
 /*
@@ -153,10 +153,16 @@ Sales.Orders.OrderDate DESC
 */
 
 --TODO: напишите здесь свое решение
-Select OrderLines.*
-from Application.People pepl
+Select 
+	pepl.PersonID
+	, pepl.FullName,
+	pepl.PhoneNumber
+From 
+	Application.People pepl
 Join Sales.Orders ord
-join Sales.OrderLines 
-ON ord.OrderID = OrderLines.OrderID
-AND OrderLines.StockItemID in (Select StockItemID From Warehouse.StockItems Where StockItemName = 'Chocolate frogs 250g')
- ON pepl.PersonID = ord.CustomerID
+	Join Sales.OrderLines 
+		Join Warehouse.StockItems
+		ON OrderLines.StockItemID = StockItems.StockItemID
+		AND StockItems.StockItemName = 'Chocolate frogs 250g'
+	ON ord.OrderID = OrderLines.OrderID
+ON pepl.PersonID = ord.CustomerID
