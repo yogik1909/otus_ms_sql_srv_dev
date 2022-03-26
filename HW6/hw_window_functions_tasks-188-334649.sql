@@ -121,6 +121,22 @@ Order by InvoiceDate, OrderID
 --напишите здесь свое решение
 
 
+	Select 
+		Invoices.InvoiceDate
+		,InvoiceLines.stockItemID
+		,Sum(InvoiceLines.Quantity)
+		,ROW_NUMBER() Over (partition by Invoices.InvoiceDate order by Sum(InvoiceLines.Quantity) Desc) Top_
+
+	From
+		Sales.InvoiceLines
+		Join Sales.Invoices
+		On InvoiceLines.InvoiceID = Invoices.InvoiceID
+	Where Invoices.InvoiceDate between N'2016-01-01' and N'2016-12-31'
+	Group by Invoices.InvoiceDate, InvoiceLines.stockItemID
+	Order by Invoices.InvoiceDate, ROW_NUMBER() Over (partition by Invoices.InvoiceDate order by Sum(InvoiceLines.Quantity) Desc)
+
+
+
 
 /*
 4. Функции одним запросом
@@ -144,6 +160,7 @@ Order by InvoiceDate, OrderID
 */
 
 --напишите здесь свое решение
+
 
 /*
 6. Выберите по каждому клиенту два самых дорогих товара, которые он покупал.
