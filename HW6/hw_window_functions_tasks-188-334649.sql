@@ -121,10 +121,15 @@ Order by InvoiceDate, OrderID
 --напишите здесь свое решение
 
 
-	Select 
+Select
+InvoiceDate
+,StockItemID
+,SumQuantity
+From 
+	(Select 
 		Invoices.InvoiceDate
 		,InvoiceLines.stockItemID
-		,Sum(InvoiceLines.Quantity)
+		,Sum(InvoiceLines.Quantity) SumQuantity
 		,ROW_NUMBER() Over (partition by Invoices.InvoiceDate order by Sum(InvoiceLines.Quantity) Desc) Top_
 
 	From
@@ -132,10 +137,8 @@ Order by InvoiceDate, OrderID
 		Join Sales.Invoices
 		On InvoiceLines.InvoiceID = Invoices.InvoiceID
 	Where Invoices.InvoiceDate between N'2016-01-01' and N'2016-12-31'
-	Group by Invoices.InvoiceDate, InvoiceLines.stockItemID
-	Order by Invoices.InvoiceDate, ROW_NUMBER() Over (partition by Invoices.InvoiceDate order by Sum(InvoiceLines.Quantity) Desc)
-
-
+	Group by Invoices.InvoiceDate, InvoiceLines.stockItemID) agrig
+where Top_ < 4
 
 
 /*
@@ -152,21 +155,67 @@ Order by InvoiceDate, OrderID
 Для этой задачи НЕ нужно писать аналог без аналитических функций.
 */
 
---напишите здесь свое решение
+Select
+StockItemID
+,StockItemName
+,Brand
+,RecommendedRetailPrice
+,ROW_NUMBER() Over (partition by Left(StockItemName, 1)  order by StockItemName) RangABC
+,SUM(1) Over () SumAll
+,SUM(1) Over (partition by Left(StockItemName, 1)) SumСover
+,Lead(StockItemID,1,-1) OVER (ORDER BY StockItemName) AS leadID
+,Lag(StockItemID,1,-1) OVER (ORDER BY StockItemName) AS lagID
+,Lag(StockItemName,2, N'No items') OVER (ORDER BY StockItemName) AS lagName
+
+From 
+Warehouse.StockItems
+
 
 /*
 5. По каждому сотруднику выведите последнего клиента, которому сотрудник что-то продал.
    В результатах должны быть ид и фамилия сотрудника, ид и название клиента, дата продажи, сумму сделки.
 */
 
---напишите здесь свое решение
+Select 
+TOP(1) with ties 
+InvoiceDate
+,SalespersonPersonID
+,People.FullName
+,Customers.CustomerID
+,Customers.CustomerName
+, SumSale
+From 
+[Sales].[Invoices]
+Join (Select [InvoiceID], SUM([Quantity] * [UnitPrice]) SumSale from [Sales].[InvoiceLines] Group by [InvoiceID]) SumSaleInvoce
+ON Invoices.InvoiceID = SumSaleInvoce.InvoiceID
+Join Application.People
+ON Invoices.SalespersonPersonID = People.PersonID
+Join Sales.Customers
+ON Invoices.CustomerID = Customers.CustomerID
+Order by ROW_NUMBER() Over (partition by SalespersonPersonID Order by InvoiceDate Desc)
+
 
 
 /*
 6. Выберите по каждому клиенту два самых дорогих товара, которые он покупал.
 В результатах должно быть ид клиета, его название, ид товара, цена, дата покупки.
 */
+Select 
+	* 
+From (
 
---напишите здесь свое решение
-
---Опционально можете для каждого запроса без оконных функций сделать вариант запросов с оконными функциями и сравнить их производительность. 
+Select 
+		Customers.CustomerID
+		,Customers.CustomerName
+		,InvoiceLines.StockItemID
+		,InvoiceLines.Description
+		,InvoiceLines.UnitPrice
+		,Invoices.InvoiceDate
+		,DENSE_RANK()       OVER(partition by Customers.CustomerID order by InvoiceLines.UnitPrice Desc) AS rnk
+	From 
+		[Sales].[Invoices]
+		join Sales.InvoiceLines
+	On Invoices.InvoiceID = InvoiceLines.InvoiceID
+		Join Sales.Customers
+	ON Invoices.CustomerID = Customers.CustomerID) t
+	Where rnk < 3
