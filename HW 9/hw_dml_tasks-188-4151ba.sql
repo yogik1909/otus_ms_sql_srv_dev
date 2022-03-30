@@ -24,19 +24,19 @@ USE WideWorldImporters
 1. Довставлять в базу пять записей используя insert в таблицу Customers или Suppliers 
 */
 
-INSERT INTO Sales.Customers (CustomerName, DeliveryPostalCode, [BillToCustomerID])
-VALUES (N'MyFirstCustomer', N'690069', 951) 
-		,(N'MySecondCustomer', N'690069', 951)
-		,(N'MyThirdCustomer', N'690069', 951)
-		,(N'MyFourthCustomer', N'690069', 951)
-		,(N'MyFifthCustomer', N'690069', 951);
+INSERT INTO Sales.Customers (CustomerName, DeliveryPostalCode, [BillToCustomerID], CustomerCategoryID)
+VALUES (N'MyFirstCustomer', N'690069', 951, 951) 
+		,(N'MySecondCustomer', N'690069', 951, 951) 
+		,(N'MyThirdCustomer', N'690069', 951, 951) 
+		,(N'MyFourthCustomer', N'690069', 951, 951) 
+		,(N'MyFifthCustomer', N'690069', 951, 951) ;
 
-INSERT INTO [Purchasing].[Suppliers] ([SupplierName], DeliveryPostalCode)
-VALUES (N'MyFirstSupplier', N'690069') 
-		,(N'MySecondSupplier', N'690069')
-		,(N'MyThirdSupplier', N'690069')
-		,(N'MyFourthSupplier', N'690069')
-		,(N'MyFifthSupplier', N'690069');
+INSERT INTO [Purchasing].[Suppliers] (SupplierID, [SupplierName], DeliveryPostalCode)
+VALUES (Next value for Sequences.SupplierID, N'MyFirstSupplier', N'690069') 
+		,(Next value for Sequences.SupplierID, N'MySecondSupplier', N'690069')
+		,(Next value for Sequences.SupplierID, N'MyThirdSupplier', N'690069')
+		,(Next value for Sequences.SupplierID, N'MyFourthSupplier', N'690069')
+		,(Next value for Sequences.SupplierID, N'MyFifthSupplier', N'690069');
 /*
 2. Удалите одну запись из Customers, которая была вами добавлена
 */
