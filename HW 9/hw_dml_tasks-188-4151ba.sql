@@ -220,15 +220,202 @@ Where DeliveryPostalCode = N'690069'
 Where DeliveryPostalCode = N'690069')
 
 UPDATE CTE_SeceltRow
-SET AccountOpenedDate = GETDATE()
+SET DeliveryPostalCode = N'690066'
 /*
 4. Написать MERGE, который вставит вставит запись в клиенты, если ее там нет, и изменит если она уже есть
 */
+;with CTE_SelectValues AS (
+Select 
+	CustomerName
+	,DeliveryPostalCode
+	,[BillToCustomerID]
+	,CustomerCategoryID
+	,PrimaryContactPersonID
+	,DeliveryMethodID
+	,DeliveryCityID
+	,PostalCityID
+	,AccountOpenedDate
+	,StandardDiscountPercentage
+	,IsStatementSent
+	,[IsOnCreditHold]
+	,[PaymentDays]
+    ,[PhoneNumber]
+    ,[FaxNumber]
+    ,[DeliveryRun]
+    ,[RunPosition]
+    ,[WebsiteURL]
+    ,[DeliveryAddressLine1]
+    ,[DeliveryAddressLine2]
+    ,[DeliveryLocation]
+    ,[PostalAddressLine1]
+    ,[PostalAddressLine2]
+    ,[PostalPostalCode]
+    ,[LastEditedBy]
+From (
+VALUES (N'MyFirstCustomer'  --CustomerName
+		,N'690069'  --DeliveryPostalCode
+		,1  --[BillToCustomerID]
+		,(Select top 1 CustomerCategoryID from Sales.CustomerCategories)  -- CustomerCategoryID
+		,(Select top 1 PersonID from Application.People) --PrimaryContactPersonID
+		,(Select top 1 DeliveryMethodID From Application.DeliveryMethods) --DeliveryMethodID
+		,(Select top 1 CityID from  Application.Cities) --DeliveryCityID
+		,(Select top 1 CityID from  Application.Cities) --PostalCityID
+		, GetDate(),0.0,0,0,0,'','','','','','','',NULL,'','','',1)
+		,(N'MySecondCustomer'  --CustomerName
+		,N'690069'  --DeliveryPostalCode
+		,1  --[BillToCustomerID]
+		,(Select top 1 CustomerCategoryID from Sales.CustomerCategories)  -- CustomerCategoryID
+		,(Select top 1 PersonID from Application.People) --PrimaryContactPersonID
+		,(Select top 1 DeliveryMethodID From Application.DeliveryMethods) --DeliveryMethodID
+		,(Select top 1 CityID from  Application.Cities) --DeliveryCityID
+		,(Select top 1 CityID from  Application.Cities) --PostalCityID
+		, GetDate(),0.0,0,0,0,'','','','','','','',NULL,'','','',1)
+		,(N'MyThirdCustomer'  --CustomerName
+		,N'690069'  --DeliveryPostalCode
+		,1  --[BillToCustomerID]
+		,(Select top 1 CustomerCategoryID from Sales.CustomerCategories)  -- CustomerCategoryID
+		,(Select top 1 PersonID from Application.People) --PrimaryContactPersonID
+		,(Select top 1 DeliveryMethodID From Application.DeliveryMethods) --DeliveryMethodID
+		,(Select top 1 CityID from  Application.Cities) --DeliveryCityID
+		,(Select top 1 CityID from  Application.Cities) --PostalCityID
+		, GetDate(),0.0,0,0,0,'','','','','','','',NULL,'','','',1)
+		,(N'MyFourthCustomer'  --CustomerName
+		,N'690069'  --DeliveryPostalCode
+		,1  --[BillToCustomerID]
+		,(Select top 1 CustomerCategoryID from Sales.CustomerCategories)  -- CustomerCategoryID
+		,(Select top 1 PersonID from Application.People) --PrimaryContactPersonID
+		,(Select top 1 DeliveryMethodID From Application.DeliveryMethods) --DeliveryMethodID
+		,(Select top 1 CityID from  Application.Cities) --DeliveryCityID
+		,(Select top 1 CityID from  Application.Cities) --PostalCityID
+		, GetDate(),0.0,0,0,0,'','','','','','','',NULL,'','','',1)
+		,(N'MyFifthCustomer'  --CustomerName
+		,N'690069'  --DeliveryPostalCode
+		,1  --[BillToCustomerID]
+		,(Select top 1 CustomerCategoryID from Sales.CustomerCategories)  -- CustomerCategoryID
+		,(Select top 1 PersonID from Application.People) --PrimaryContactPersonID
+		,(Select top 1 DeliveryMethodID From Application.DeliveryMethods) --DeliveryMethodID
+		,(Select top 1 CityID from  Application.Cities) --DeliveryCityID
+		,(Select top 1 CityID from  Application.Cities) --PostalCityID
+		, GetDate(),0.0,0,0,0,'','','','','','','',NULL,'','','',1)
+) as x(CustomerName
+	,DeliveryPostalCode
+	,[BillToCustomerID]
+	,CustomerCategoryID
+	,PrimaryContactPersonID
+	,DeliveryMethodID
+	,DeliveryCityID
+	,PostalCityID
+	,AccountOpenedDate
+	,StandardDiscountPercentage
+	,IsStatementSent
+	,[IsOnCreditHold]
+	,[PaymentDays]
+    ,[PhoneNumber]
+    ,[FaxNumber]
+    ,[DeliveryRun]
+    ,[RunPosition]
+    ,[WebsiteURL]
+    ,[DeliveryAddressLine1]
+    ,[DeliveryAddressLine2]
+    ,[DeliveryLocation]
+    ,[PostalAddressLine1]
+    ,[PostalAddressLine2]
+    ,[PostalPostalCode]
+    ,[LastEditedBy])
+)
 
-напишите здесь свое решение
+
+--select  s.CustomerName, CTE_SelectValues.Customername from [Sales].[Customers] s Left Join CTE_SelectValues	ON s.CustomerName = s.CustomerName
+
+Merge [Sales].[Customers] t
+	Using CTE_SelectValues s
+	ON s.CustomerName = t.CustomerName
+When Matched
+	Then Update 
+	Set t.CustomerName	=	s.CustomerName
+	,t.DeliveryPostalCode	=	s.DeliveryPostalCode
+	,t.[BillToCustomerID]	=	s.[BillToCustomerID]
+	,t.CustomerCategoryID	=	s.CustomerCategoryID
+	,t.PrimaryContactPersonID	=	s.PrimaryContactPersonID
+	,t.DeliveryMethodID	=	s.DeliveryMethodID
+	,t.DeliveryCityID	=	s.DeliveryCityID
+	,t.PostalCityID	=	s.PostalCityID
+	,t.AccountOpenedDate	=	s.AccountOpenedDate
+	,t.StandardDiscountPercentage	=	s.StandardDiscountPercentage
+	,t.IsStatementSent	=	s.IsStatementSent
+	,t.[IsOnCreditHold]	=	s.[IsOnCreditHold]
+	,t.[PaymentDays]	=	s.[PaymentDays]
+    ,t.[PhoneNumber]	= s.[PhoneNumber]
+    ,t.[FaxNumber]	= s.[FaxNumber]
+    ,t.[DeliveryRun]	= s.[DeliveryRun]
+    ,t.[RunPosition]	= s.[RunPosition]
+    ,t.[WebsiteURL]	= s.[WebsiteURL]
+    ,t.[DeliveryAddressLine1]	= s.[DeliveryAddressLine1]
+    ,t.[DeliveryAddressLine2]	= s.[DeliveryAddressLine2]
+    ,t.[DeliveryLocation] = s.[DeliveryLocation]
+    ,t.[PostalAddressLine1]	= s.[PostalAddressLine1]
+    ,t.[PostalAddressLine2]	= s.[PostalAddressLine2]
+    ,t.[PostalPostalCode] = s.[PostalPostalCode]
+    ,t.[LastEditedBy] = s.[LastEditedBy]
+When NOT Matched
+THEN INSERT 
+	(CustomerName
+	,DeliveryPostalCode
+	,[BillToCustomerID]
+	,CustomerCategoryID
+	,PrimaryContactPersonID
+	,DeliveryMethodID
+	,DeliveryCityID
+	,PostalCityID
+	,AccountOpenedDate
+	,StandardDiscountPercentage
+	,IsStatementSent
+	,[IsOnCreditHold]
+	,[PaymentDays]
+    ,[PhoneNumber]
+    ,[FaxNumber]
+    ,[DeliveryRun]
+    ,[RunPosition]
+    ,[WebsiteURL]
+    ,[DeliveryAddressLine1]
+    ,[DeliveryAddressLine2]
+    ,[DeliveryLocation]
+    ,[PostalAddressLine1]
+    ,[PostalAddressLine2]
+    ,[PostalPostalCode]
+    ,[LastEditedBy])
+	VALUES (s.CustomerName
+	,s.DeliveryPostalCode
+	,s.[BillToCustomerID]
+	,s.CustomerCategoryID
+	,s.PrimaryContactPersonID
+	,s.DeliveryMethodID
+	,s.DeliveryCityID
+	,s.PostalCityID
+	,s.AccountOpenedDate
+	,s.StandardDiscountPercentage
+	,s.IsStatementSent
+	,s.[IsOnCreditHold]
+	,s.[PaymentDays]
+    ,s.[PhoneNumber]
+    ,s.[FaxNumber]
+    ,s.[DeliveryRun]
+    ,s.[RunPosition]
+    ,s.[WebsiteURL]
+    ,s.[DeliveryAddressLine1]
+    ,s.[DeliveryAddressLine2]
+    ,s.[DeliveryLocation]
+    ,s.[PostalAddressLine1]
+    ,s.[PostalAddressLine2]
+    ,s.[PostalPostalCode]
+    ,s.[LastEditedBy]
+)
+WHEN NOT MATCHED BY SOURCE 
+    THEN DELETE
+output deleted.*, $action, inserted.*;
+
 
 /*
 5. Напишите запрос, который выгрузит данные через bcp out и загрузить через bulk insert
 */
 
-напишите здесь свое решение
