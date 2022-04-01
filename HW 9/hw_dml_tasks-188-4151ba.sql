@@ -417,3 +417,20 @@ output deleted.*, $action, inserted.*;
 5. Напишите запрос, который выгрузит данные через bcp out и загрузить через bulk insert
 */
 
+--Так как моя база восстановлена на сервере котороая актвно используется да еще и на Linux сервере, не могу пока подключить cmd/
+
+--- bcp "[WideWorldImporters].[Sales].[InvoiceLines]" out "D:\1.dat" -T -w -t '#com#' -S adm-1c-db
+-- Команда вызывалась на рабочей машине винды. 
+	BULK INSERT [WideWorldImporters].[Sales].[InvoiceLines__]
+				   FROM "/storage/public/1.dat" -- Мой север SQL на Linux
+				   WITH 
+					 (
+						BATCHSIZE = 1000, 
+						DATAFILETYPE = 'widechar',
+						FIELDTERMINATOR = '#com#',
+						ROWTERMINATOR ='\n',
+						KEEPNULLS,
+						TABLOCK        
+					  );
+
+Select * from [Sales].[InvoiceLines__]
