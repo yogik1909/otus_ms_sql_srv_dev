@@ -357,8 +357,8 @@ When Matched
     ,t.[PostalAddressLine2]	= s.[PostalAddressLine2]
     ,t.[PostalPostalCode] = s.[PostalPostalCode]
     ,t.[LastEditedBy] = s.[LastEditedBy]
-When NOT Matched
-THEN INSERT 
+When NOT Matched THEN
+INSERT 
 	(CustomerName
 	,DeliveryPostalCode
 	,[BillToCustomerID]
@@ -410,8 +410,6 @@ THEN INSERT
     ,s.[PostalPostalCode]
     ,s.[LastEditedBy]
 )
-WHEN NOT MATCHED BY SOURCE 
-    THEN DELETE
 output deleted.*, $action, inserted.*;
 
 
