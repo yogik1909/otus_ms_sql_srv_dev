@@ -38,8 +38,28 @@ InvoiceMonth | Peeples Valley, AZ | Medicine Lodge, KS | Gasport, NY | Sylvanite
 01.02.2013   |      7             |        3           |      4      |      2        |     1
 -------------+--------------------+--------------------+-------------+--------------+------------
 */
-
-напишите здесь свое решение
+SELECT InvoiceMonth,   
+  [Sylvanite, MT], [Peeples Valley, AZ], [Medicine Lodge, KS], [Gasport, NY], [Jessie, ND]  
+FROM  
+(
+  Select 
+  Invoices.InvoiceDate,
+FORMAT( Invoices.InvoiceDate, 'dd.MM.yyyy') InvoiceMonth
+,SUBSTRING(Customers.CustomerName, CHARINDEX('(', Customers.CustomerName)+1, CHARINDEX(')', Customers.CustomerName) - CHARINDEX('(', Customers.CustomerName) - 1) CustomerName
+,Invoices.InvoiceID
+From 
+Sales.Invoices
+left join Sales.Customers
+On Invoices.CustomerID = Customers.CustomerID
+Where 
+Invoices.CustomerID between 2 and 6
+) AS SourceTable  
+PIVOT  
+(  
+  COUNT(InvoiceID)  
+  FOR CustomerName IN ([Sylvanite, MT], [Peeples Valley, AZ], [Medicine Lodge, KS], [Gasport, NY], [Jessie, ND])  
+) AS PivotTable
+Order by PivotTable.InvoiceDate;
 
 /*
 2. Для всех клиентов с именем, в котором есть "Tailspin Toys"
@@ -56,7 +76,7 @@ Tailspin Toys (Head Office) | Ribeiroville
 ----------------------------+--------------------
 */
 
-напишите здесь свое решение
+--напишите здесь свое решение
 
 /*
 3. В таблице стран (Application.Countries) есть поля с цифровым кодом страны и с буквенным.
@@ -74,11 +94,11 @@ CountryId | CountryName | Code
 ----------+-------------+-------
 */
 
-напишите здесь свое решение
+--напишите здесь свое решение
 
 /*
 4. Выберите по каждому клиенту два самых дорогих товара, которые он покупал.
 В результатах должно быть ид клиета, его название, ид товара, цена, дата покупки.
 */
 
-напишите здесь свое решение
+--напишите здесь свое решение
