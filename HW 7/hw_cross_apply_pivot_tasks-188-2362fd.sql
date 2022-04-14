@@ -43,10 +43,10 @@ SELECT InvoiceMonth,
 FROM  
 (
   Select 
-  Invoices.InvoiceDate,
-FORMAT( Invoices.InvoiceDate, 'dd.MM.yyyy') InvoiceMonth
-,SUBSTRING(Customers.CustomerName, CHARINDEX('(', Customers.CustomerName)+1, CHARINDEX(')', Customers.CustomerName) - CHARINDEX('(', Customers.CustomerName) - 1) CustomerName
-,Invoices.InvoiceID
+	Invoices.InvoiceDate,
+	FORMAT( Invoices.InvoiceDate, 'dd.MM.yyyy') InvoiceMonth
+	,SUBSTRING(Customers.CustomerName, CHARINDEX('(', Customers.CustomerName)+1, CHARINDEX(')', Customers.CustomerName) - CHARINDEX('(', Customers.CustomerName) - 1) CustomerName
+	,Invoices.InvoiceID
 From 
 Sales.Invoices
 left join Sales.Customers
