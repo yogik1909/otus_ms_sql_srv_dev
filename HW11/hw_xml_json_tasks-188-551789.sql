@@ -39,14 +39,22 @@ USE WideWorldImporters
 существующие записи в таблице обновить, отсутствующие добавить (сопоставлять записи по полю StockItemName). 
 */
 
-напишите здесь свое решение
+DECLARE @xmlFile xml
+
+SELECT @xmlFile = BulkComumn
+FROM OPENROWSET
+(BULK N'/storage/public/StockItems-188-1fb5df.xml', 
+ SINGLE_CLOB)
+as data
+
+
 
 /*
 2. Выгрузить данные из таблицы StockItems в такой же xml-файл, как StockItems.xml
 Сделать два варианта: с помощью OPENXML и через XQuery.
 */
 
-напишите здесь свое решение
+--напишите здесь свое решение
 
 
 /*
@@ -58,7 +66,7 @@ USE WideWorldImporters
 - FirstTag (из поля CustomFields, первое значение из массива Tags)
 */
 
-напишите здесь свое решение
+--напишите здесь свое решение
 
 /*
 4. Найти в StockItems строки, где есть тэг "Vintage".
@@ -80,4 +88,4 @@ USE WideWorldImporters
 */
 
 
-напишите здесь свое решение
+--напишите здесь свое решение
