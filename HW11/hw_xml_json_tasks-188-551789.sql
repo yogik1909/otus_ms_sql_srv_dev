@@ -51,13 +51,12 @@ DECLARE @docHandle int
 EXEC sp_xml_preparedocument @docHandle OUTPUT, @xmlDocument
 
 DROP table IF EXISTS #tt115973246__ 
---Select * INTO #tt115973246__ From Warehouse.StockItems Where 1=0
 
 SELECT *
 INTO #tt115973246__
 FROM OPENXML(@docHandle, N'/StockItems/Item')
 WITH ( 
-	[StockItemName] nvarchar(25)  '@Name',
+	[StockItemName] nvarchar(100)  '@Name',
 	[SupplierID] int 'SupplierID',
 	[UnitPackageID] int 'Package/UnitPackageID',
 	[OuterPackageID] int 'Package/OuterPackageID',
@@ -68,6 +67,61 @@ WITH (
 	[TaxRate] decimal(18, 3) 'TaxRate',
 	[UnitPrice] decimal(19,3) 'UnitPrice')
 
+Select * From #tt115973246__ as s
+	full join [Warehouse].[StockItems] as t
+	ON s.[StockItemName] = t.StockItemName
+
+
+
+BEGIN TRANSACTION megreXMLFile
+
+MERGE
+	[Warehouse].[StockItems] as t
+	using 
+	#tt115973246__ as s
+	
+	ON t.[StockItemName] = s.[StockItemName]
+When Matched
+	then update 
+	SET t.[StockItemName] = s.[StockItemName]
+	,t.[SupplierID] = s.[SupplierID]
+	,t.[UnitPackageID] = s.[UnitPackageID]
+	,t.[OuterPackageID] = s.[OuterPackageID]
+	,t.[QuantityPerOuter] = s.[QuantityPerOuter]
+	,t.[TypicalWeightPerUnit] = s.[TypicalWeightPerUnit]
+	,t.[LeadTimeDays] = s.[LeadTimeDays]
+	,t.[IsChillerStock] = s.[IsChillerStock]
+	,t.[TaxRate] = s.[TaxRate]
+	,t.[UnitPrice] = s.[UnitPrice]
+	When not matched
+	then insert ([StockItemName]
+			,[SupplierID]
+           ,[UnitPackageID]
+           ,[OuterPackageID]
+           ,[QuantityPerOuter]
+           ,[IsChillerStock]
+           ,[TaxRate]
+           ,[UnitPrice]
+           ,[TypicalWeightPerUnit]
+		   ,[LeadTimeDays],
+		   [LastEditedBy])
+     VALUES
+           (s.[StockItemName]
+           ,s.SupplierID
+           ,s.UnitPackageID
+           ,s.OuterPackageID
+           ,s.QuantityPerOuter
+           ,s.IsChillerStock
+           ,s.TaxRate
+           ,s.UnitPrice
+           ,s.TypicalWeightPerUnit
+		   ,s.LeadTimeDays
+		   ,1)
+
+
+	output $action, inserted.*, deleted.*;
+
+ROLLBACK TRANSACTION megreXMLFile
 
 
 /*
