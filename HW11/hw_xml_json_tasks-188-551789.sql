@@ -39,13 +39,34 @@ USE WideWorldImporters
 существующие записи в таблице обновить, отсутствующие добавить (сопоставлять записи по полю StockItemName). 
 */
 
-DECLARE @xmlFile xml
+DECLARE @xmlDocument  xml
 
-SELECT @xmlFile = BulkComumn
+SELECT @xmlDocument = BulkColumn
 FROM OPENROWSET
-(BULK N'/storage/public/StockItems-188-1fb5df.xml', 
+(BULK '/storage/public/StockItems-188-1fb5df.xml', 
  SINGLE_CLOB)
-as data
+as data 
+
+DECLARE @docHandle int
+EXEC sp_xml_preparedocument @docHandle OUTPUT, @xmlDocument
+
+DROP table IF EXISTS #tt115973246__ 
+--Select * INTO #tt115973246__ From Warehouse.StockItems Where 1=0
+
+SELECT *
+INTO #tt115973246__
+FROM OPENXML(@docHandle, N'/StockItems/Item')
+WITH ( 
+	[StockItemName] nvarchar(25)  '@Name',
+	[SupplierID] int 'SupplierID',
+	[UnitPackageID] int 'Package/UnitPackageID',
+	[OuterPackageID] int 'Package/OuterPackageID',
+	[QuantityPerOuter] int 'Package/QuantityPerOuter',
+	[TypicalWeightPerUnit] decimal(18,3) 'Package/TypicalWeightPerUnit',
+	[LeadTimeDays] int 'LeadTimeDays',
+	[IsChillerStock] bit 'IsChillerStock',
+	[TaxRate] decimal(18, 3) 'TaxRate',
+	[UnitPrice] decimal(19,3) 'UnitPrice')
 
 
 
