@@ -129,7 +129,19 @@ ROLLBACK TRANSACTION megreXMLFile
 Сделать два варианта: с помощью OPENXML и через XQuery.
 */
 
---напишите здесь свое решение
+Select TOP(15)
+StockItemName
+,SupplierID
+,UnitPackageID
+,OuterPackageID
+,QuantityPerOuter
+,TypicalWeightPerUnit
+,LeadTimeDays
+,IsChillerStock
+,TaxRate
+,UnitPrice
+From Warehouse.StockItems
+FOR XML AUTO
 
 
 /*
