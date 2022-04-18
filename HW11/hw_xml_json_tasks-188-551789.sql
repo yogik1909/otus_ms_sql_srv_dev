@@ -181,7 +181,7 @@ StockItemID
 , (SELECT * FROM OPENJSON(CustomFields)
         WITH (  CountryOfManufacture VARCHAR(10) '$.CountryOfManufacture')) as CountryOfManufacture
 , (SELECT * FROM OPENJSON(CustomFields)
-        WITH (  CountryOfManufacture VARCHAR(10) '$.Tags[0]')) as Tags
+        WITH (  CountryOfManufacture VARCHAR(10) '$.Tags[0]')) as FirstValueTags
 
 From 
 	Warehouse.StockItems 
