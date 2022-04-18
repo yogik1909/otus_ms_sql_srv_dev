@@ -207,5 +207,13 @@ From
 ... where ... CustomFields like '%Vintage%' 
 */
 
+Select 
+StockItemID
+,StockItemName
+,CustomFields
+,
 
---напишите здесь свое решение
+
+From 
+	Warehouse.StockItems 
+
