@@ -129,19 +129,40 @@ ROLLBACK TRANSACTION megreXMLFile
 Сделать два варианта: с помощью OPENXML и через XQuery.
 */
 
-Select TOP(15)
-StockItemName
+Select 
+StockItemName as "@Name"
 ,SupplierID
-,UnitPackageID
-,OuterPackageID
+,(SELECT UnitPackageID 
+,OuterPackageID 
 ,QuantityPerOuter
-,TypicalWeightPerUnit
+,TypicalWeightPerUnit 
+From Warehouse.StockItems inq where StockItems.StockItemID = inq.StockItemID FOR XML PATH (''), type) as "Package"
+
 ,LeadTimeDays
 ,IsChillerStock
 ,TaxRate
 ,UnitPrice
 From Warehouse.StockItems
-FOR XML AUTO
+where StockItemID IN (11, 12)
+FOR XML PATH('Item'), TYPE, ROOT ('StockItems')
+
+Select 
+StockItemName as "@Name"
+,SupplierID 
+,UnitPackageID "Package/UnitPackageID"
+,OuterPackageID "Package/OuterPackageID"
+,QuantityPerOuter "Package/QuantityPerOuter"
+,TypicalWeightPerUnit "Package/TypicalWeightPerUnit"
+,LeadTimeDays
+,IsChillerStock
+,TaxRate
+,UnitPrice
+From Warehouse.StockItems
+where StockItemID IN (11, 12)
+FOR XML PATH('Item'), TYPE, ROOT ('StockItems')
+-- Первый вариант мне нравится больше, так как нужно мешь писать или может можно задать какой то шаблон "Package/*" что бы не дублирвоать имя корневого элемемнта Package
+
+-- Что то не понял, что хначит два варианта с помощью с помощью OPENXML и через XQuery
 
 
 /*
@@ -153,7 +174,19 @@ FOR XML AUTO
 - FirstTag (из поля CustomFields, первое значение из массива Tags)
 */
 
---напишите здесь свое решение
+Select 
+StockItemID
+,StockItemName
+,CustomFields
+, (SELECT * FROM OPENJSON(CustomFields)
+        WITH (  CountryOfManufacture VARCHAR(10) '$.CountryOfManufacture')) as CountryOfManufacture
+, (SELECT * FROM OPENJSON(CustomFields)
+        WITH (  CountryOfManufacture VARCHAR(10) '$.Tags[0]')) as Tags
+
+From 
+	Warehouse.StockItems 
+
+
 
 /*
 4. Найти в StockItems строки, где есть тэг "Vintage".
