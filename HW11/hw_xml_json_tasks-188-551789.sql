@@ -207,13 +207,19 @@ From
 ... where ... CustomFields like '%Vintage%' 
 */
 
-Select 
-StockItemID
+Select StockItemID
 ,StockItemName
-,CustomFields
-,
-
-
+,STRING_AGG ( Tags.Value, ', ') AllTags
 From 
-	Warehouse.StockItems 
-
+	 (Select 
+		StockItemID
+		,StockItemName
+		,CustomFields
+		From 
+			Warehouse.StockItems 
+			CROSS APPLY OPENJSON(CustomFields, '$.Tags') Tags
+		Where Tags.Value = 'Vintage') _vq
+		CROSS APPLY OPENJSON(CustomFields, '$.Tags') Tags
+	Group by StockItemID
+			,StockItemName
+--Моя реализация задания под звездочкой кажется мне не крутой, думаю должне быть более элегатный способ.
