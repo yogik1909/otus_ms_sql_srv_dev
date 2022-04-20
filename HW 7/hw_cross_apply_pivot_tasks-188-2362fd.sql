@@ -76,7 +76,19 @@ Tailspin Toys (Head Office) | Ribeiroville
 ----------------------------+--------------------
 */
 
---напишите здесь свое решение
+Select
+	CustomerName
+	,crossTable.AddressLine
+From
+	[Sales].[Customers]
+	OUTER APPLY (Select DeliveryAddressLine1 AddressLine From
+	[Sales].[Customers] inCust Where Customers.CustomerID = inCust.CustomerID
+	UNION ALL
+	Select DeliveryAddressLine2 From
+	[Sales].[Customers] inCust Where Customers.CustomerID = inCust.CustomerID) crossTable
+Where
+	CustomerName	Like '%Tailspin Toys%' 
+Order by CustomerID
 
 /*
 3. В таблице стран (Application.Countries) есть поля с цифровым кодом страны и с буквенным.
@@ -94,11 +106,53 @@ CountryId | CountryName | Code
 ----------+-------------+-------
 */
 
---напишите здесь свое решение
+Select
+	CountryID
+	,CountryName
+	,outCode.Code
+From 
+	Application.Countries
+	OUTER APPLY (
+	Select
+	IsoAlpha3Code Code
+From 
+	Application.Countries inCoun
+	Where 
+		Countries.CountryID = inCoun.CountryID 
+	UNION ALL 
+	Select
+	Cast(IsoNumericCode as varchar(5)) Code
+From 
+	Application.Countries inCoun
+	Where 
+		Countries.CountryID = inCoun.CountryID) outCode
+-- Тоже самое, что и в прошлом задании? или я не правильно понял задание?
 
 /*
 4. Выберите по каждому клиенту два самых дорогих товара, которые он покупал.
 В результатах должно быть ид клиета, его название, ид товара, цена, дата покупки.
 */
 
---напишите здесь свое решение
+Select 
+	CustomerID
+	,CustomerName
+	,OrderLines.*
+
+From 
+	Sales.Customers
+	OUTER APPLY (
+		Select TOP 2
+			MAX(OrderDate) OrderDate 
+			,StockItemID
+			,UnitPrice
+		From
+			Sales.Orders
+				join Sales.OrderLines
+				ON Orders.OrderID = OrderLines.OrderLineID
+				Where CustomerID = Customers.CustomerID
+		Group BY StockItemID
+			,UnitPrice 
+		Order BY UnitPrice DESC
+				
+	) OrderLines
+Order BY CustomerID, OrderLines.UnitPrice DESC
